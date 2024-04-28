@@ -1,0 +1,32 @@
+import React, { } from "react";
+import { Box, Grid, Paper } from "@mui/material";
+import { styled } from '@mui/material/styles';
+import { TodoItem } from "../../types/app.crm.todo";
+import TodoGrid from "./TodoGrid";
+import { useUserIdentity } from "../../providers/UserIdentityProvider";
+
+const Item = styled(Paper)(({ theme }) => ({
+    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+    ...theme.typography.body2,
+    padding: theme.spacing(1),
+
+    color: theme.palette.text.secondary,
+}));
+
+export default function Dashboard() {
+    const { userIdentity } = useUserIdentity();
+    return (
+        <Box component="div" sx={{ width: '100%' }}>
+            <Grid container spacing={{ xs: 2, sm: 3, md: 4 }} columns={{ xs: 12 }}>
+                <Grid item xs={12}>
+                    <Item>
+                        {userIdentity && userIdentity.id &&
+                            <TodoGrid onItemClick={(item: TodoItem) => { }} />
+                        }
+                    </Item>
+                    
+                </Grid>
+            </Grid>
+        </Box>
+    )
+}
