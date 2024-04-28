@@ -1,6 +1,6 @@
 import { AccessToken } from "../types/google.accounts";
 
-export function fetchAccessTokenByAuthCode(code: string, serverBackendUrl: string): Promise<AccessToken> {
+export function fetchAccessTokenByAuthCode(code: string, serverBackendUrl: string): Promise<AccessToken | null> {
     console.log('fetchTokensByAuthCode start', serverBackendUrl);
     const _url = `${serverBackendUrl}api/auth/google`;
     return fetch(_url, {

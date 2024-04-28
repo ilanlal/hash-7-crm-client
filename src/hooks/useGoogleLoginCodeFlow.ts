@@ -28,7 +28,7 @@ type GoogleLoginCodeFlowProps = {
 export default function useGoogleLoginCodeFlow(props: GoogleLoginCodeFlowProps): () => void;
 
 export default function useGoogleLoginCodeFlow({
-    include_granted_scopes, select_account, scope, state, onSuccess }: GoogleLoginCodeFlowProps): ()=>void {
+    include_granted_scopes, select_account, scope, state, onSuccess }: GoogleLoginCodeFlowProps): () => void {
 
     const { config } = useContext<Settings>(AppSettingContext);
     const scriptLoadedSuccessfully = useGoogleIdentityClientLibrary({
@@ -57,17 +57,23 @@ export default function useGoogleLoginCodeFlow({
     // Handle new tokens from Google OAuth
     const verifyTokenByCode = async (codeResponse: CodeResponse): Promise<AccessToken> => {
         console.log('verifyTokenByCode', codeResponse);
-        const tokensResponse = await fetchAccessTokenByAuthCode(codeResponse.code, config.serverBackendUrl);
-
-        if (!tokensResponse) {
-            console.error('Failed to fetch tokens by auth code');
-            return Promise.reject(tokensResponse);
-        }
-
-        // Set tokens
-        storeTokens(tokensResponse);
-        //setAccessTokenRef.current(tokensResponse);
-        return Promise.resolve(tokensResponse);
+        return fetchAccessTokenByAuthCode(codeResponse.code, config.serverBackendUrl)
+            .then((tokensResponse) => {
+                console.log('fetchAccessTokenByAuthCode response', tokensResponse);
+                if (!tokensResponse) {
+                    console.error('Failed to fetch tokens by auth code');
+                    return Promise.reject(tokensResponse);
+                }
+        
+                // Set tokens
+                storeTokens(tokensResponse);
+                //setAccessTokenRef.current(tokensResponse);
+                return Promise.resolve(tokensResponse);
+            })
+            .catch((error) => {
+                console.error('fetchAccessTokenByAuthCode error', error);
+                return Promise.reject(error);
+            });
     };
     const verifyTokenByCodeRef = useRef(verifyTokenByCode);
     verifyTokenByCodeRef.current = verifyTokenByCode;
@@ -92,5 +98,5 @@ export default function useGoogleLoginCodeFlow({
         clientRef.current = client;
     }, [scriptLoadedSuccessfully]);
 
-    return useCallback(()=> clientRef.current?.requestCode(), []);
+    return useCallback(() => clientRef.current?.requestCode(), []);
 }

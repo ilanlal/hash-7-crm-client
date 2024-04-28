@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from 'react'
+import React, { useContext, useRef, useState } from 'react'
 import { Alert, Box, Button, Typography } from '@mui/material'
 import { BASIC_SCOPES, useAccessToken } from '../../providers/AccessTokenProvider';
 import { CodeResponse } from '../../types/google.accounts';
@@ -10,7 +10,7 @@ import { AppSettingContext } from '../../context';
 export default function SignInCodeFlow() {
   const { config } = useContext<Settings>(AppSettingContext);
   const { handleSignInSuccess } = useAccessToken();
-
+  const [error, setError] = useState<string | null>(null);
   // Handle new tokens from Google OAuth
   const verifyTokenByCode = (codeResponse: CodeResponse) => {
     console.log('verifyTokenByCode');
@@ -24,14 +24,24 @@ export default function SignInCodeFlow() {
       .then((tokensResponse) => {
         console.log('fetchTokensByAuthCode response', tokensResponse);
 
+        if (!tokensResponse) {
+          console.warn('error: tokensResponse is null', tokensResponse);
+          return Promise.resolve(tokensResponse);
+        }
+
         handleSignInSuccess?.(tokensResponse);
         return Promise.resolve(tokensResponse);
+      })
+      .catch((error) => {
+        console.error('fetchTokensByAuthCode error', error);
+        setError('Error: Unable to sign in');
+        return Promise.resolve(null);
       });
   };
 
   const onUserClick = useGoogleLoginCodeFlow({
     onSuccess: (codeResponse) => {
-      if(!codeResponse.code) {
+      if (!codeResponse.code) {
         console.warn('error: codeResponse.code is null', codeResponse);
         return codeResponse;
       }
@@ -62,6 +72,13 @@ export default function SignInCodeFlow() {
             Sign in to continue
           </Typography>
         </Box>
+        {error &&
+          <Box sx={{ display: 'block', wordBreak: 'break-word' }}>
+            <Typography variant="body2" component="span" fontSize={'12px'}
+              sx={{ color: 'error.main' }}>
+              {error}
+            </Typography>
+          </Box>}
       </Alert>
     </Box>
   )
