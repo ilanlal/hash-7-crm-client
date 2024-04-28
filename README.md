@@ -25,3 +25,6 @@ This is a simple todo app built with React and Firebase. It uses Firebase's Fire
 - Material-UI
 - Google Cloud Platform
 - Google Developer Console
+
+## Build
+
