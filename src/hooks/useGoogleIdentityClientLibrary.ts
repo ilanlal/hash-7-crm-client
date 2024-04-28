@@ -11,14 +11,6 @@ interface GoogleIdentityClientLibraryProps {
 
 export default function useGoogleIdentityClientLibrary( { nonce }: GoogleIdentityClientLibraryProps): boolean {
     const [scriptLoadedSuccessfully, setScriptLoadedSuccessfully] = useState(false);
-    //const [client, setClient] = useState<any>(null);
-    //const onScriptLoadSuccessRef = useRef(onScriptLoadSuccess);
-    //onScriptLoadSuccessRef.current = onScriptLoadSuccess;
-
-    //const onerrorRef = useRef(onerror);
-    //onerrorRef.current = onerror;
-
-    //const [client, setClient] = useState<any>(null);
 
     useEffect(() => {
         console.log('useEffect load google client library script');

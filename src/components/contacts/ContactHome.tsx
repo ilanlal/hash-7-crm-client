@@ -9,9 +9,9 @@ export default function ContactHome() {
     const { setLoading } = useContext<AppViewModel>(AppViewContext);
     const setLoadingRef = useRef(setLoading);
     setLoadingRef.current = setLoading;
-    const [totalItems, setTotalItems] = useState(0);
-    const [pages, setPages] = useState<[OtherContactsListResponse]>();
-    const [selectedPage, setSelectedPage] = useState<OtherContactsListResponse | null>(null);
+    const [totalItems] = useState(0);
+    const [pages] = useState<[OtherContactsListResponse]>();
+    const [selectedPage] = useState<OtherContactsListResponse | null>(null);
     const ref = useRef<HTMLDivElement>(null);
 
     const [selectedItem, setSelectedItem] = useState<Person | null>(null);

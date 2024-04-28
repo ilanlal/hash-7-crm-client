@@ -1,22 +1,17 @@
-import { Box, Button, Card, CardActions, CardContent, CardHeader, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Skeleton } from '@mui/material';
+import React, { } from 'react';
+import { Button, Card, CardActions, CardContent, CardHeader, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { Person } from '../../types/gapis.contacts';
-import React, { useContext, useMemo } from 'react';
-import { AppViewContext, AppViewModel } from '../../context';
 import PersonIcon from '@mui/icons-material/Person';
 import EditIcon from '@mui/icons-material/Edit';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 
 export default function ContactsList({ onItemClick }: { onItemClick: (item: Person) => void, }) {
-
-    const { setLoading } = useContext<AppViewModel>(AppViewContext);
-
-    const [items, setItems] = React.useState<Person[]>([]);
+    const [items] = React.useState<Person[]>([]);
 
     const handelClick = (item: Person) => {
         console.log('handelClick', item);
         onItemClick(item);
     };
-    const scopes = useMemo(() => ['https://www.googleapis.com/auth/contacts.other.readonly'], []);
 
     return (
         <Card>
@@ -47,7 +42,7 @@ export default function ContactsList({ onItemClick }: { onItemClick: (item: Pers
                                         <ListItemIcon>
                                             <PersonIcon />
                                         </ListItemIcon>
-                                        <ListItemText id={labelId} primary={person?.names[0]?.displayName} secondary={'📞 ' + person?.phoneNumbers?.[0]?.value } />
+                                        <ListItemText id={labelId} primary={person?.names[0]?.displayName} secondary={'📞 ' + person?.phoneNumbers?.[0]?.value} />
                                     </ListItemButton>
                                 </ListItem>
                             );
@@ -58,7 +53,7 @@ export default function ContactsList({ onItemClick }: { onItemClick: (item: Pers
             <CardActions>
                 <Button size="small">Add</Button>
                 <Button size="small">Sync</Button>
-                
+
             </CardActions>
         </Card>
 

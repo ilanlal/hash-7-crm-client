@@ -1,11 +1,10 @@
 import React, { useContext, useRef } from 'react'
-import { AppSettingContext, AppViewContext, AppViewModel } from '../../context';
-import { Box, Button, Card, CardActions, CardContent, CardHeader, Typography } from '@mui/material';
+import { AppViewContext, AppViewModel } from '../../context';
+import { Box, Card, CardContent, CardHeader, Typography } from '@mui/material';
 import { Person } from '../../types/gapis.contacts';
 
 export default function Person360({ person }: { person: Person }) {
-  const { config } = useContext(AppSettingContext);
-  const { loading, setLoading } = useContext<AppViewModel>(AppViewContext);
+  const { setLoading } = useContext<AppViewModel>(AppViewContext);
   const setLoadingRef = useRef(setLoading);
   setLoadingRef.current = setLoading;
 

@@ -4,7 +4,7 @@ import useGoogleIdentityClientLibrary from './useGoogleIdentityClientLibrary';
 import { AppSettingContext } from '../context';
 import { Settings } from '../types/app';
 import { storeTokens } from '../connections/local-storage';
-import { fetchTokensByAuthCode } from '../connections/auth';
+import { fetchAccessTokenByAuthCode } from '../connections/auth';
 import { BASIC_SCOPES } from '../providers/AccessTokenProvider';
 
 interface AuthCodeFlowProps
@@ -57,7 +57,7 @@ export default function useGoogleLoginCodeFlow({
     // Handle new tokens from Google OAuth
     const verifyTokenByCode = async (codeResponse: CodeResponse): Promise<AccessToken> => {
         console.log('verifyTokenByCode', codeResponse);
-        const tokensResponse = await fetchTokensByAuthCode(codeResponse.code, config.serverBackendUrl);
+        const tokensResponse = await fetchAccessTokenByAuthCode(codeResponse.code, config.serverBackendUrl);
 
         if (!tokensResponse) {
             console.error('Failed to fetch tokens by auth code');

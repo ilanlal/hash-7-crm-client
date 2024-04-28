@@ -19,7 +19,7 @@ export const config = {
   apiKey: process.env.REACT_APP_API_KEY,
   clientId: process.env.REACT_APP_CLIENT_ID,
   appName: "Hash 7 - CRM",
-  serverBackendUrl: process.env.REACT_APP_SERVER_BACKEND_URL
+  serverBackendUrl: process.env.REACT_APP_SERVER_URL
 };
 
 const firebase_app = initializeApp(firebaseConfig);

@@ -1,6 +1,6 @@
 import { AccessToken } from "../types/google.accounts";
 
-export function fetchTokensByAuthCode(code: string, serverBackendUrl: string): Promise<AccessToken | any> {
+export function fetchAccessTokenByAuthCode(code: string, serverBackendUrl: string): Promise<AccessToken> {
     console.log('fetchTokensByAuthCode start', serverBackendUrl);
     const _url = `${serverBackendUrl}api/auth/google`;
     return fetch(_url, {
@@ -10,7 +10,7 @@ export function fetchTokensByAuthCode(code: string, serverBackendUrl: string): P
         },
         body: decodeURIComponent(code),
     })
-        .then(response => response.json())
+        .then(response => Promise.resolve(response.json()))
         .catch((error) => {
             console.log('fetchTokens error', error);
             return Promise.reject(error);

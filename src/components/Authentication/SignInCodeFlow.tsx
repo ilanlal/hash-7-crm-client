@@ -1,8 +1,8 @@
 import React, { useContext, useRef } from 'react'
 import { Alert, Box, Button, Typography } from '@mui/material'
 import { BASIC_SCOPES, useAccessToken } from '../../providers/AccessTokenProvider';
-import { AccessToken, CodeResponse } from '../../types/google.accounts';
-import { fetchTokensByAuthCode } from '../../connections/auth';
+import { CodeResponse } from '../../types/google.accounts';
+import { fetchAccessTokenByAuthCode } from '../../connections/auth';
 import useGoogleLoginCodeFlow from '../../hooks/useGoogleLoginCodeFlow';
 import { Settings } from '../../types/app';
 import { AppSettingContext } from '../../context';
@@ -10,28 +10,34 @@ import { AppSettingContext } from '../../context';
 export default function SignInCodeFlow() {
   const { config } = useContext<Settings>(AppSettingContext);
   const { handleSignInSuccess } = useAccessToken();
+
   // Handle new tokens from Google OAuth
-  const verifyTokenByCode = async (codeResponse: CodeResponse): Promise<AccessToken> => {
+  const verifyTokenByCode = (codeResponse: CodeResponse) => {
     console.log('verifyTokenByCode');
 
     if (!codeResponse.code) {
       console.warn('error: codeResponse.code is null', codeResponse);
-      return Promise.reject(codeResponse);
+      return codeResponse;
     }
 
-    const tokensResponse = await fetchTokensByAuthCode(codeResponse.code, config.serverBackendUrl);
-    console.log('verifyTokenByCode response', tokensResponse);
-    if (!tokensResponse) {
-      console.warn('error: tokensRespomse is null', tokensResponse);
-      return Promise.reject(tokensResponse);
-    }
+    fetchAccessTokenByAuthCode(codeResponse.code, config.serverBackendUrl)
+      .then((tokensResponse) => {
+        console.log('fetchTokensByAuthCode response', tokensResponse);
 
-    handleSignInSuccess?.(tokensResponse);
-    return Promise.resolve(tokensResponse);
+        handleSignInSuccess?.(tokensResponse);
+        return Promise.resolve(tokensResponse);
+      });
   };
 
   const onUserClick = useGoogleLoginCodeFlow({
-    onSuccess: (codeResponse) => verifyTokenByCode(codeResponse),
+    onSuccess: (codeResponse) => {
+      if(!codeResponse.code) {
+        console.warn('error: codeResponse.code is null', codeResponse);
+        return codeResponse;
+      }
+
+      return verifyTokenByCode(codeResponse);
+    },
     flow: 'auth-code',
     include_granted_scopes: true,
     select_account: true,
