@@ -7,6 +7,7 @@ import { clearStoredTokens, readStoredAccessToken, readStoredRefreshToken, store
 import { Settings } from '../types/app';
 import useGoogleIdentityClientLibrary from '../hooks/useGoogleIdentityClientLibrary';
 import SignInCodeFlow from '../components/Authentication/SignInCodeFlow';
+import SignInImplicitFlow from '../components/Authentication/SignInImplicitFlow';
 
 export const BASIC_SCOPES = [
     'https://www.googleapis.com/auth/userinfo.email',
@@ -169,8 +170,12 @@ export default function AccessTokenProvider({ children }: AccessTokenProviderPro
     return (
         <AccessTokenContext.Provider value={contextValue}>
             {contextValue?.accessToken ? children :
+                
                 <SignInCodeFlow />
-                /*{<GrantMeAccessScopeAlert
+                /*
+                
+                <SignInImplicitFlow />
+                {<GrantMeAccessScopeAlert
                     resion={contextValue?.resion || 'Please grant me access to your Google Account'}
                     scope={contextValue?.scope || BASIC_SCOPES.join(' ')}
                     severity='warning'
