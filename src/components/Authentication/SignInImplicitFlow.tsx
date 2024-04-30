@@ -1,38 +1,27 @@
 import React, { useRef, useState } from 'react'
 import { Alert, Box, Button, Typography } from '@mui/material'
 import {  useAccessToken } from '../../providers/AccessTokenProvider';
-import { CredentialResponse } from '../../types/google.accounts';
 import useGoogleImplicitLogin from '../../hooks/useGoogleImplicitLogin';
 
 export default function SignInImplicitFlow() {
   const { handleSignInSuccess } = useAccessToken();
   const [error, setError] = useState<string | null>(null);
-  // Handle new tokens from Google OAuth
-  const verifyTokenByCode = (credentialResponse: CredentialResponse) => {
-    console.log('verifyTokenByCode');
-
-    if (!credentialResponse.credential) {
-      console.warn('error: credentialResponse.n is null', credentialResponse);
-      return credentialResponse;
-    }
-
-    //handleSignInSuccess?.(credentialResponse.credential);
-  };
 
   const onUserClick = useGoogleImplicitLogin({
-    onSuccess: (credentialResponse) => {
-      if (!credentialResponse.credential) {
-        console.warn('error: credentialResponse.credential is null', credentialResponse);
-        return credentialResponse;
+    onSuccess: (accessToken) => {
+      if (!accessToken.access_token) {
+        console.warn('error: access_token is null', accessToken);
+        setError('Error: Unable to sign in');
+        return accessToken;
       }
 
-      return verifyTokenByCode(credentialResponse);
+      console.log('onSuccess', accessToken);
+      handleSignInSuccess?.(accessToken);
     }
   });
 
   const onUserClickRef = useRef(onUserClick);
   onUserClickRef.current = onUserClick;
-
 
   return (
     <Box>

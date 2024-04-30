@@ -6,7 +6,6 @@ import { revoke } from '../connections/google.accounts';
 import { clearStoredTokens, readStoredAccessToken, readStoredRefreshToken, storeTokens } from '../connections/local-storage';
 import { Settings } from '../types/app';
 import useGoogleIdentityClientLibrary from '../hooks/useGoogleIdentityClientLibrary';
-import SignInCodeFlow from '../components/Authentication/SignInCodeFlow';
 import SignInImplicitFlow from '../components/Authentication/SignInImplicitFlow';
 
 export const BASIC_SCOPES = [
@@ -72,17 +71,7 @@ export default function AccessTokenProvider({ children }: AccessTokenProviderPro
         // Check if refresh token is in session storage
         const refreshToken = readStoredRefreshToken();
         if (refreshToken) {
-            return fetchRefreshTokens(refreshToken, config.serverBackendUrl)
-                .then((response) => {
-                    console.log('fetchRefreshTokens response');
-                    setAccessToken?.(response);
-                    storeTokens(response);
-                    return Promise.resolve(response);
-                })
-                .catch((error) => {
-                    console.log('fetchRefreshTokens error', error);
-                    return Promise.reject(error);
-                });
+            return fetchRefreshTokens(refreshToken, config.serverBackendUrl);
         }
         return Promise.reject({
             error: 'refresh token is null, need to login'
@@ -122,7 +111,16 @@ export default function AccessTokenProvider({ children }: AccessTokenProviderPro
                     console.log('useEffect access token is expired, need to refresh!');
                     if (scriptLoadedSuccessfully) {
                         console.log('useEffect scriptLoadedSuccessfully, try to refresh access token');
-                        refreshTokenRef?.current();
+                        refreshTokenRef?.current()
+                            .then((response) => {
+                                console.log('useEffect refresh token success!');
+                                setAccessToken?.(response);
+                            })
+                            .catch((error) => {
+                                console.log('useEffect refresh token error', error);
+                                clearStoredTokens();
+                                setAccessToken?.(null);
+                            });
                     }
                 } else {
                     console.log('useEffect access token is not expired 🙂');
@@ -161,7 +159,9 @@ export default function AccessTokenProvider({ children }: AccessTokenProviderPro
             signOutRef?.current?.();
         },
         handleSignInSuccess: (accessToken: AccessToken) => {
-            console.log('handleSignInSuccess', accessToken);
+            if (!accessToken.expired_timestamp) {
+                accessToken.expired_timestamp = new Date().getTime() + ((accessToken?.expires_in || 0) * 1000);
+            }
             setAccessToken(accessToken);
             storeTokens(accessToken);
         }
@@ -170,10 +170,10 @@ export default function AccessTokenProvider({ children }: AccessTokenProviderPro
     return (
         <AccessTokenContext.Provider value={contextValue}>
             {contextValue?.accessToken ? children :
-                
-                <SignInCodeFlow />
+                <SignInImplicitFlow />
+
                 /*
-                
+                <SignInCodeFlow />
                 <SignInImplicitFlow />
                 {<GrantMeAccessScopeAlert
                     resion={contextValue?.resion || 'Please grant me access to your Google Account'}

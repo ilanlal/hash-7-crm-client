@@ -56,10 +56,8 @@ export default function useGoogleLoginCodeFlow({
 
     // Handle new tokens from Google OAuth
     const verifyTokenByCode = async (codeResponse: CodeResponse): Promise<AccessToken> => {
-        console.log('verifyTokenByCode', codeResponse);
         return fetchAccessTokenByAuthCode(codeResponse.code, config.serverBackendUrl)
             .then((tokensResponse) => {
-                console.log('fetchAccessTokenByAuthCode response', tokensResponse);
                 if (!tokensResponse) {
                     console.error('Failed to fetch tokens by auth code');
                     return Promise.reject(tokensResponse);
