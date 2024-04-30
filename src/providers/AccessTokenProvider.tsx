@@ -66,16 +66,16 @@ export default function AccessTokenProvider({ children }: AccessTokenProviderPro
     const [scope, setScope] = useState<string | null>(null);
     const [resion, setResion] = useState<string | null>(null);
 
-    // Fetch new access token by refresh token
-    const refreshToken = async (): Promise<AccessToken> => {
+    // Fetch new access token by refresh token if refresh token is available
+    const refreshToken = async (): Promise<AccessToken | null> => {
         // Check if refresh token is in session storage
         const refreshToken = readStoredRefreshToken();
         if (refreshToken) {
             return fetchRefreshTokens(refreshToken, config.serverBackendUrl);
         }
-        return Promise.reject({
-            error: 'refresh token is null, need to login'
-        });
+
+        console.log('refresh token is null, need to login');
+        return Promise.resolve(null);
     };
     const refreshTokenRef = useRef(refreshToken);
     refreshTokenRef.current = refreshToken;

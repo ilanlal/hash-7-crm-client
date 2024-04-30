@@ -7,16 +7,10 @@ import { Route, Routes } from 'react-router-dom';
 import { Box, Container } from '@mui/material';
 import NotFound from './components/pages/NotFound';
 import { Led, UserIdentity } from './types/app';
-import ContactHome from './components/contacts/ContactHome';
-import Dashboard from './components/todo/Dashboard';
+import Dashboard from './components/pages/Dashboard';
 import theme from './theme';
 import UserIdentityProvider from './providers/UserIdentityProvider';
 import { useAccessToken } from './providers/AccessTokenProvider';
-
-// TODO: Override console.log to begin each log with a yellow marker
-//console.log.bind(console, '🔸🔻🟦🟫🟪🟩🟨🟥⬜◽');
-
-console.log.bind('◽');
 
 const OffsetTop = styled('div')(({ theme }) => ({
   marginTop: theme.spacing(10),
@@ -47,7 +41,6 @@ export default function App() {
               {/* Routes */}
               <Routes>
                 <Route path="/" element={<Dashboard />} />
-                <Route path="/alerts" element={<ContactHome />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Box>

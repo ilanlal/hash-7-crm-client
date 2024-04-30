@@ -6,4 +6,7 @@ export interface ContactItem {
     email?: string;
     phone?: string;
     todos?: TodoItem[];
+    isNew?: boolean;
+    createdOn?: Date;
+    modifiedOn?: Date;
 };

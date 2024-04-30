@@ -1,16 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-
-import { config } from './firebase-config';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import { BrowserRouter } from 'react-router-dom';
+import { config } from './firebase-config';
 import { AppSettingContext } from './context';
-import App from './App';
-import theme from './theme';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import AccessTokenProvider from './providers/AccessTokenProvider';
+import App from './App';
+import theme from './theme';
 
 const rootElement = document.getElementById('root');
 

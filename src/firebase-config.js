@@ -12,7 +12,7 @@ export const config = {
   messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.REACT_APP_FIREBASE_APP_ID,
   measurementId: "G-R2HLT073YF",
-  name: "Hash 7 - CRM"
+  appName: "Hash 7 - CRM"
 };
 
 const firebase_app = initializeApp(config);
