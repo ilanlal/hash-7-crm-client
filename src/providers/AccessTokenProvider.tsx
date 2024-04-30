@@ -6,7 +6,7 @@ import { revoke } from '../connections/google.accounts';
 import { clearStoredTokens, readStoredAccessToken, readStoredRefreshToken, storeTokens } from '../connections/local-storage';
 import { Settings } from '../types/app';
 import useGoogleIdentityClientLibrary from '../hooks/useGoogleIdentityClientLibrary';
-import SignInImplicitFlow from '../components/Authentication/SignInImplicitFlow';
+import SignInImplicitFlow from '../components/authentication/SignInImplicitFlow';
 
 export const BASIC_SCOPES = [
     'https://www.googleapis.com/auth/userinfo.email',
@@ -169,7 +169,7 @@ export default function AccessTokenProvider({ children }: AccessTokenProviderPro
 
     return (
         <AccessTokenContext.Provider value={contextValue}>
-            {contextValue?.accessToken ? children :
+            {!contextValue?.accessToken &&
                 <SignInImplicitFlow />
 
                 /*
@@ -184,6 +184,7 @@ export default function AccessTokenProvider({ children }: AccessTokenProviderPro
                     onSigninClick={() => console.log('onSigninClick')}
             />}*/
             }
+            {children}
         </AccessTokenContext.Provider >
     )
 };

@@ -14,8 +14,7 @@ export default function SignInImplicitFlow() {
         setError('Error: Unable to sign in');
         return accessToken;
       }
-
-      console.log('onSuccess', accessToken);
+      setError(null);
       handleSignInSuccess?.(accessToken);
     }
   });

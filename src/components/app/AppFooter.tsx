@@ -1,7 +1,7 @@
 import React, { } from 'react'
 import { Box, Stack, Typography } from '@mui/material'
 import { Link } from 'react-router-dom';
-import Timer from './Timer';
+import Timer from '../authentication/Timer';
 import { useAccessToken } from '../../providers/AccessTokenProvider';
 
 export default function AppFooter() {

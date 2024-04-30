@@ -126,8 +126,6 @@ export const clearStoredTokens = () => {
 
 // Sets tokens properties and bind to session storage
 export const storeTokens = (response: AccessToken): void => {
-    console.log('handleStoreTokensResponse', response);
-
     if (response) {
         if (response.error) {
             console.log('error: tokens error', response.error);

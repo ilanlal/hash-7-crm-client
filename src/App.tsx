@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
-import AppHead from './components/topbar/AppHead';
-import AppFooter from './components/footer/AppFooter';
+import AppTopBar from './components/app/AppTopBar';
+import AppFooter from './components/app/AppFooter';
 import { AppDataContext, AppViewContext } from './context';
 import { Route, Routes } from 'react-router-dom';
 import { Box, Container } from '@mui/material';
@@ -12,18 +12,37 @@ import theme from './theme';
 import UserIdentityProvider from './providers/UserIdentityProvider';
 import { useAccessToken } from './providers/AccessTokenProvider';
 
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
+  open?: boolean;
+}>(({ theme, open }) => ({
+  flexGrow: 1,
+  padding: theme.spacing(3),
+  transition: theme.transitions.create('margin', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    marginLeft: '240px',
+  }),
+}));
+
 const OffsetTop = styled('div')(({ theme }) => ({
-  marginTop: theme.spacing(10),
+  marginTop: theme.spacing(4),
 }));
 
 const OffsetBottom = styled('div')(({ theme }) => ({
-  paddingBottom: theme.spacing(14),
+  paddingBottom: theme.spacing(12),
 }));
 
 export default function App() {
   const [userIdentity, setUserIdentity] = useState<UserIdentity | null>();
   const [loading, setLoading] = useState<boolean>(false);
   const { accessToken } = useAccessToken();
+  const [open, setOpen] = useState(false);
   return (
     <AppViewContext.Provider value={{
       loading, setLoading,
@@ -35,15 +54,16 @@ export default function App() {
       <UserIdentityProvider>
         <AppDataContext.Provider value={{ userIdentity, setUserIdentity }}>
           <Container maxWidth="lg" >
-            <AppHead />
+            <AppTopBar open={open} setOpen={setOpen} />
             <OffsetTop />
-            <Box component="main" sx={{ m: 0 }}  >
+            <Main open={open}>
               {/* Routes */}
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </Box>
+            </Main>
+
             <OffsetBottom />
             <Box component="footer" sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff' }}>
               <AppFooter />

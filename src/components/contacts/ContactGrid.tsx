@@ -50,6 +50,7 @@ export default function ContactGrid({ title, onItemClick }: { title?: string, on
             field: 'phone',
             headerName: 'Phone',
             width: 250,
+            flex: 1,
             editable: true
         },
         {

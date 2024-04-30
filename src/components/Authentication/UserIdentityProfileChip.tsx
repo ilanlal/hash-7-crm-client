@@ -15,7 +15,7 @@ export interface UserIdentityProfileChipProps extends AccessTokenEventHandlerPro
 
 export default function UserIdentityProfileChip() {
     const { handleSignOut, handleRevokeAccess, handleRefreshAccessToken } = useAccessToken();
-    //const [userIdentity] = useState<UserIdentity | null>(null); // [userIdentity, setUserIdentity] = useState<UserIdentity | null>(null);
+    
     const { userIdentity } = useUserIdentity();
     const [anchorElUser, setAnchorElUser] = useState(null);
 

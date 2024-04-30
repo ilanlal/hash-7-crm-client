@@ -73,8 +73,10 @@ export default function TodoGrid({ title, onItemClick }: { title?: string, onIte
         {
             field: 'description',
             headerName: '📑 Details',
+            description: 'Details of the task',
             width: 250,
-            editable: true
+            editable: true,
+            flex: 1,
         },
         {
             field: 'actions',

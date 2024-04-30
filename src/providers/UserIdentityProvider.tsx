@@ -38,11 +38,9 @@ export default function UserIdentityProvider({ children }: UserIdentityProviderP
     userIdentityRef.current = userIdentity;
 
     const { accessToken } = useAccessToken();
-    const accessTokenRef = useRef(accessToken);
-    accessTokenRef.current = accessToken;
 
     const handleStoreUserIdentity = (userIdentity: UserIdentity): void => {
-        console.log('handleStoreUserIdentity', userIdentity.email);
+        if(!userIdentity) return;
         getUserByEmail(userIdentity.email)
             .then((user) => {
                 if (user === null) {
@@ -68,19 +66,20 @@ export default function UserIdentityProvider({ children }: UserIdentityProviderP
             return;
         }
 
-        if (!accessTokenRef?.current) {
+        if (!accessToken) {
             console.warn('useEffect [userIdentity] accessToken is null, nothing to do 🤷‍♂️');
             return;
         }
 
         console.log('useEffect userIdentity is null, try to fetch user info and access token ok try fetch userInfo 🚀');
 
-        fetchUserInfo(accessTokenRef?.current)
+        fetchUserInfo(accessToken)
             .then((response) => {
-                console.log('fetchUserInfo response', response);
+                console.log('fetchUserInfo response 🙂');
                 handleStoreUserIdentity(response);
-            });
-    }, [userIdentity]);
+            })
+            .catch((error)=>console.log('Error fetching user identity',error));
+    }, [userIdentity,accessToken]);
 
     const contextValue = useMemo(() => ({
         refreshUserInfo: () => {

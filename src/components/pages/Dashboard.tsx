@@ -1,5 +1,5 @@
 import React, { } from "react";
-import { Box, Grid, Paper } from "@mui/material";
+import { Grid, Paper } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import { TodoItem } from "../../types/app.crm.todo";
 import TodoGrid from "../todo/TodoGrid";
@@ -17,25 +17,23 @@ const Item = styled(Paper)(({ theme }) => ({
 export default function Dashboard() {
     const { userIdentity } = useUserIdentity();
     return (
-        <Box component="div" sx={{ width: '100%' }}>
-            <Grid container spacing={{ xs: 2, sm: 3, md: 4 }} columns={{ xs: 12 }}>
-                <Grid item xs={12}>
-                    <Item>
-                        {userIdentity && userIdentity.id &&
-                            <TodoGrid onItemClick={(item: TodoItem) => { }} />
-                        }
-                    </Item>
+        <Grid container spacing={{ xs: 2, sm: 3, md: 4 }} columns={{ xs: 12, sm: 12 }}>
+            <Grid item xs={12} sm={12}>
+                <Item>
+                    {userIdentity && userIdentity.id &&
+                        <TodoGrid onItemClick={(item: TodoItem) => { }} />
+                    }
+                </Item>
 
-                </Grid>
-                <Grid item xs={12}>
-                    <Item>
-                        {userIdentity && userIdentity.id &&
-                            <ContactGrid onItemClick={(item: ContactItem) => { }} />
-                        }
-                    </Item>
-
-                </Grid>
             </Grid>
-        </Box>
+            <Grid item xs={12} sm={12}>
+                <Item>
+                    {userIdentity && userIdentity.id &&
+                        <ContactGrid onItemClick={(item: ContactItem) => { }} />
+                    }
+                </Item>
+
+            </Grid>
+        </Grid>
     )
 }
