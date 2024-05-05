@@ -1,5 +1,5 @@
 import { GoogleCredentialResponse } from '../types/google.accounts';
-import { TimePeriod } from '../types/app.crm.todo';
+import { TimePeriod } from '../types/app.crm.tasks';
 
 export const FIVE_MINUTES_IN_MS = 1000 * 60 * 5;
 export const EMPTY_TIMER = '00:00:00';

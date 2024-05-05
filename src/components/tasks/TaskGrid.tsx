@@ -1,25 +1,24 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { TodoItem } from '../../types/app.crm.todo';
-import { AppViewContext, AppViewModel } from '../../context';
+import { TodoItem } from '../../types/app.crm.tasks';
 import { addDoc, collection, deleteDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase-config';
 import { DataGrid, GridActionsCellItem, GridColDef, GridEventListener, GridRowEditStopReasons, GridRowId, GridRowModes, GridRowModesModel, GridSlots, GridToolbar } from '@mui/x-data-grid';
 import { guidGenerator, parseToTimePeriod } from '../../utils';
-import { listAll } from '../../connections/crm.todo';
+import { listAllTasks } from '../../connections/crm.tasks';
 import RowActionsMenu from './RowActionsMenu';
 import dayjs from 'dayjs';
 import { useAccessToken } from '../../providers/AccessTokenProvider';
 
-export interface TodoGridProps {
+export interface TaskGridProps {
     loading: boolean;
     setLoading: (loading: boolean) => void;
 }
 
-export default function TodoGrid({ loading, setLoading }: TodoGridProps) {
+export default function TaskGrid({ loading, setLoading }: TaskGridProps) {
     const columns: GridColDef<TodoItem>[] = [
         {
             field: 'id',
@@ -257,7 +256,7 @@ export default function TodoGrid({ loading, setLoading }: TodoGridProps) {
         console.log('handleRefresh');
         setLoading(true);
         setRows([]);
-        listAll(currentUser?.id || '').then((items) => {
+        listAllTasks(currentUser?.id || '').then((items) => {
             setRows(items);
         })
             .finally(() => {
@@ -271,7 +270,7 @@ export default function TodoGrid({ loading, setLoading }: TodoGridProps) {
             return;
         }
         setLodingRef.current(true);
-        listAll(currentUser?.id || '').then((items) => {
+        listAllTasks(currentUser?.id || '').then((items) => {
             setRowsRef.current(items);
         })
             .finally(() => {

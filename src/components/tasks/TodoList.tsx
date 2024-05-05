@@ -4,14 +4,14 @@ import VerifiedIcon from '@mui/icons-material/Verified';
 import RestoreIcon from '@mui/icons-material/Restore';
 import { Task as TaskIcon } from '@mui/icons-material';
 import React, { useContext, useMemo, useRef, useState } from 'react';
-import { TodoItem } from '../../types/app.crm.todo';
+import { TodoItem } from '../../types/app.crm.tasks';
 import { AppDataContext, AppViewContext, AppViewModel } from '../../context';
 import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase-config';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { AppDataModel } from '../../types/app';
 import dayjs from 'dayjs';
-import { listAll } from '../../connections/crm.todo';
+import { listAllTasks } from '../../connections/crm.tasks';
 
 
 export default function TodoList({ onItemClick }: { onItemClick: (item: TodoItem) => void, }) {
@@ -68,7 +68,7 @@ export default function TodoList({ onItemClick }: { onItemClick: (item: TodoItem
     };
 
     useMemo(() => {
-        listAll(userIdentity?.id || '')
+        listAllTasks(userIdentity?.id || '')
             .then((response) => {
                 setRowsRef.current(response);
             });

@@ -1,23 +1,17 @@
 import React, { useEffect } from 'react';
-import { Alert, Box, Button, Card,  CardActions, CardContent, CardHeader, Typography } from '@mui/material';
+import { Alert, Box, Button, Card, CardActions, CardContent, Typography } from '@mui/material';
 import { useAccessToken } from '../providers/AccessTokenProvider';
-import { useNavigate } from 'react-router-dom';
 import { PageProps } from './page.props';
 
 export default function Login({ loading, setLoading }: PageProps) {
     const [error, setError] = React.useState<string | null>(null);
     const { currentUser, signIn } = useAccessToken();
-    const navigate = useNavigate();
 
     useEffect(() => {
         if (currentUser?.id) {
-            setLoading?.(false);
-            navigate('/dashboard');
+            console.log('User is already signed in.');
         }
-        else {
-            setLoading?.(true);
-        }
-    }, []);
+    }, [currentUser?.id]);
 
     return (
         <Box sx={{ display: 'inline-block', mx: '2px', transform: 'scale(0.8)' }}>
@@ -29,10 +23,16 @@ export default function Login({ loading, setLoading }: PageProps) {
                     </Typography>
                 </CardContent>
                 <CardActions>
-                    <Button color="inherit" size="small" disabled={loading && false}
+                    <Button color="inherit" size="small" disabled={loading || false}
                         onClick={() => {
-                            setLoading?.(true);
-                            return signIn?.()
+                            try {
+                                setLoading?.(true);
+                                return signIn?.()
+                            } catch (error) {
+                                setError('Failed to sign in with Google. Please try again.');
+                                setLoading?.(false);
+                                return null;
+                            } 
                         }} >
                         Sign In with Google
                     </Button>

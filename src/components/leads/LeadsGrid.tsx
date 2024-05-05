@@ -1,4 +1,4 @@
-import React, {  useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
@@ -8,14 +8,14 @@ import { db } from '../../firebase-config';
 import { DataGrid, GridActionsCellItem, GridColDef, GridEventListener, GridRowEditStopReasons, GridRowId, GridRowModes, GridRowModesModel, GridSlots, GridToolbar } from '@mui/x-data-grid';
 import { guidGenerator } from '../../utils';
 import RowActionsMenu from './RowActionsMenu';
-import { ContactItem } from '../../types/app.crm.contact';
-import { listAllContact } from '../../connections/crm.contacts';
 import { useAccessToken } from '../../providers/AccessTokenProvider';
 import { PageProps } from '../../pages/page.props';
+import { LeadItem } from '../../types/app.crm.leads';
+import { listAllLeads } from '../../connections/crm.leads';
 
-export default function ContactGrid({loading,setLoading}:PageProps) {
-    const COLLECTION_NAME = 'contacts';
-    const columns: GridColDef<ContactItem>[] = [
+export default function LeadsGrid({ loading, setLoading }: PageProps) {
+    const COLLECTION_NAME = 'leads';
+    const columns: GridColDef<LeadItem>[] = [
         {
             field: 'id',
             type: 'string',
@@ -28,29 +28,22 @@ export default function ContactGrid({loading,setLoading}:PageProps) {
             groupable: false,
             filterable: false,
             disableColumnMenu: true,
-            valueFormatter: (params) => '🤴',
+            valueFormatter: (params) => '👂',
         },
         {
-            field: 'displayName',
-            headerName: 'Name',
+            field: 'title',
+            headerName: '💭 Tasks',
             width: 150,
             editable: true,
-            description: 'Name of the contact'
+            description: 'Title of the task'
         },
         {
-            field: 'email',
-            headerName: 'Email',
-            description: 'Email address of the contact',
-            type: 'string',
-            width: 210,
-            editable: true
-        },
-        {
-            field: 'phone',
-            headerName: 'Phone',
+            field: 'description',
+            headerName: '📑 Details',
+            description: 'Details of the task',
             width: 250,
+            editable: true,
             flex: 1,
-            editable: true
         },
         {
             field: 'actions',
@@ -85,7 +78,7 @@ export default function ContactGrid({loading,setLoading}:PageProps) {
                     <GridActionsCellItem
                         icon={<EditIcon />}
                         label="Edit"
-                        
+
                         onClick={handleEditClick(id)}
                         color="inherit"
                     />,
@@ -109,21 +102,20 @@ export default function ContactGrid({loading,setLoading}:PageProps) {
                                 .then((response) => {
                                     const item = response.data();
                                     if (item) {
-                                        const _item = {
+                                        const todoItem = {
                                             id: '',
-                                            displayName: 'Copy of ' + item.displayName,
-                                            email: item.email || null,
-                                            phone: item.phone,
+                                            title: 'Copy of ' + item.title,
+                                            description: item.description || null,
                                             createdOn: new Date(),
                                             modifiedOn: new Date()
                                         };
                                         const itemCollectionContext = collection(db, `users`, currentUser?.id || '', COLLECTION_NAME);
 
-                                        addDoc(itemCollectionContext, _item)
+                                        addDoc(itemCollectionContext, todoItem)
                                             .then((response) => {
                                                 console.log('createItem success', response);
-                                                _item.id = response.id;
-                                                setRows([...rows, _item]);
+                                                todoItem.id = response.id;
+                                                setRows([...rows, todoItem]);
                                             });
                                     }
                                 });
@@ -134,21 +126,20 @@ export default function ContactGrid({loading,setLoading}:PageProps) {
             },
         }
     ];
-
     const setLodingRef = useRef(setLoading);
     setLodingRef.current = setLoading;
 
     const { currentUser } = useAccessToken();
 
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
-    const [rows, setRows] = React.useState<ContactItem[]>([]);
+    const [rows, setRows] = useState<LeadItem[]>([]);
     const setRowsRef = useRef(setRows);
     setRowsRef.current = setRows;
 
     const handleAddClick = () => {
         const id = guidGenerator();
         // Add a new row to the grid
-        setRows([...rows, { id, displayName: 'New Contact', isNew: true}]);
+        setRows([...rows, { id, title: 'New Lead', isNew: true }]);
         setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
 
     };
@@ -179,25 +170,24 @@ export default function ContactGrid({loading,setLoading}:PageProps) {
         }
     };
 
-    const processRowUpdate = (newRow: ContactItem): Promise<ContactItem> => {
+    const processRowUpdate = (newRow: LeadItem): Promise<LeadItem> => {
         console.log('processRowUpdate', newRow);
         return new Promise((resolve, reject) => {
             if (newRow.isNew) {
                 console.log('createItem', newRow);
-                const _item = {
+                const todoItem = {
                     id: '',
-                    displayName: newRow.displayName,
-                    email: newRow.email || null,
-                    phone: newRow.phone || null,
+                    title: newRow.title,
+                    description: newRow.description || null,
                     createdOn: new Date(),
                     modifiedOn: new Date()
                 };
                 const itemCollectionContext = collection(db, `users`, currentUser?.id || '', COLLECTION_NAME);
 
-                addDoc(itemCollectionContext, _item)
+                addDoc(itemCollectionContext, todoItem)
                     .then((response) => {
                         console.log('createItem success', response);
-                        _item.id = response.id;
+                        todoItem.id = response.id;
                         //setRows([...rows, newRow]);
                         resolve(newRow);
                     });
@@ -223,10 +213,9 @@ export default function ContactGrid({loading,setLoading}:PageProps) {
 
     const handleRefreshClick = () => {
         console.log('handleRefresh');
-        if(!currentUser?.id) return;
         setLoading(true);
         setRows([]);
-        listAllContact(currentUser?.id || '').then((items) => {
+        listAllLeads(currentUser?.id || '').then((items) => {
             setRows(items);
         })
             .finally(() => {
@@ -235,9 +224,12 @@ export default function ContactGrid({loading,setLoading}:PageProps) {
     };
 
     useEffect(() => {
-        if(!currentUser?.id) return;
+        if (!currentUser?.id) {
+            console.log('currentUser?.id is null');
+            return;
+        }
         setLodingRef.current(true);
-        listAllContact(currentUser?.id || '').then((items) => {
+        listAllLeads(currentUser?.id || '').then((items) => {
             setRowsRef.current(items);
         })
             .finally(() => {
@@ -272,13 +264,14 @@ export default function ContactGrid({loading,setLoading}:PageProps) {
                     </Button>
                     <Box sx={{ flexGrow: 1 }} />
                     <Typography alignContent={'center'} variant="caption" component="span">
-                        {COLLECTION_NAME}
+                        Tasks
                     </Typography>
                 </Stack>
                 <Box sx={{ m: '1' }}>
                     <DataGrid
                         autoHeight
                         rows={rows}
+                        {...rows}
                         columns={columns}
                         editMode="row"
                         rowModesModel={rowModesModel}
@@ -298,7 +291,10 @@ export default function ContactGrid({loading,setLoading}:PageProps) {
                                 showQuickFilter: true
                             }
                         }}
-                        initialState={{pagination: {paginationModel: {pageSize: 5}}}}
+
+                        initialState={{
+                            pagination: { paginationModel: { pageSize: 5 } }
+                        }}
                         pageSizeOptions={[5, 15, 25]}
                     />
                 </Box>

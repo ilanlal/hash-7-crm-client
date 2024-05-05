@@ -1,41 +1,34 @@
 import { addDoc, collection, deleteDoc, doc, getDocs } from "firebase/firestore";
-import { TimePeriod, TodoItem } from "../types/app.crm.todo";
 import { auth, db } from "../firebase-config";
+import { LeadItem } from "../types/app.crm.leads";
 
-export function listAll(uid: string): Promise<TodoItem[]> {
-    console.log('listTodoItems', { uid });
+const LEAD_COLLECTION = 'leads';
+export function listAllLeads(uid: string): Promise<LeadItem[]> {
     if (uid === '' || uid === null || uid === undefined) {
-        console.log('listTodoItems empty uid');
+        console.log('listAllLeads empty uid');
         return Promise.resolve([]);
     }
-    const itemCollectionContext = collection(db, `users`, uid, `todos`);
+    const itemCollectionContext = collection(db, `users`, uid, LEAD_COLLECTION);
 
     return new Promise((resolve, reject) => {
         getDocs(itemCollectionContext)
             .then(response => {
-                console.log('listTodoItems success');
+                console.log('listAllLeads success');
                 const items = response.docs.map((doc) => ({
                     ...doc.data(),
-                    id: doc.id,
-                    title: doc.data().title,
-                    description: doc.data().description,
-                    dueDate: doc.data().dueDate ? doc.data().dueDate?.toDate() : null,
-                    completed: doc.data().completed,
-                    createdOn: doc.data().createdOn?.toDate(),
-                    modifiedOn: doc.data().modifiedOn?.toDate(),
-                    timePeriod: doc.data().timePeriod ? TimePeriod[doc.data().timePeriod as keyof typeof TimePeriod] : null
-                } as TodoItem));
+                    id: doc.id
+                } as LeadItem));
                 resolve(items);
             })
             .catch(err => {
-                console.log('listTodoItems error', err);
+                console.log('listAllLeads error', err);
                 reject(err);
             });
     });
 };
 
-export function createItem(item: TodoItem): Promise<TodoItem> {
-    const itemCollectionContext = collection(db, `users/${auth.currentUser?.uid}/todos`);
+export function createLead(item: LeadItem): Promise<LeadItem> {
+    const itemCollectionContext = collection(db, `users/${auth.currentUser?.uid}/${LEAD_COLLECTION}`);
     return new Promise((resolve, reject) => {
         addDoc(itemCollectionContext, item)
             .then(response => {
@@ -49,9 +42,8 @@ export function createItem(item: TodoItem): Promise<TodoItem> {
     });
 };
 
-export function deleteItem(uid: string, id: string): Promise<boolean> {
-    const docRef = doc(db, `users/${uid}/todos/${id}`);
-    console.log('deleteItem', { id });
+export function deleteLead(uid: string, id: string): Promise<boolean> {
+    const docRef = doc(db, `users/${uid}/${LEAD_COLLECTION}/${id}`);
 
     return new Promise((resolve, reject) => {
         deleteDoc(docRef)

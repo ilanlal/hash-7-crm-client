@@ -3,16 +3,32 @@ import Typography from '@mui/material/Typography';
 import Toolbar from '@mui/material/Toolbar';
 import AdbIcon from '@mui/icons-material/Adb';
 import UserIdentityProfileChip from '../authentication/UserIdentityProfileChip';
-import { AppSettingContext, AppViewContext } from '../../context';
+import { AppSettingContext } from '../../context';
 import { Box, IconButton } from '@mui/material';
 import AppMenu from './AppMenu';
 import MenuIcon from '@mui/icons-material/Menu';
+import { useAccessToken } from '../../providers/AccessTokenProvider';
+import { Led } from '../../types/app';
 
 const dark = { inputProps: { 'aria-label': 'Switch Themes' }, 'onChange': (e: any) => { console.log('Thems changed!!! ', e) } };
 
-export default function AppTopBar({ open, setOpen }: { open: boolean, setOpen: (open: boolean) => void }) {
+interface AppTopBarProps {
+    open: boolean;
+    setOpen: (open: boolean) => void;
+    loading?: boolean;
+    setLoading?: (loading: boolean) => void;
+};
+
+export default function AppTopBar({ open, setOpen, loading, setLoading }: AppTopBarProps) {
     const { config } = useContext(AppSettingContext);
-    const { led1, led2, led3, led4 } = useContext(AppViewContext);
+    const { accessToken, currentUser } = useAccessToken();
+    const leds = [
+        accessToken ? Led.On : Led.Idle, 
+        currentUser ? Led.On : Led.Idle, 
+        currentUser?.id ? Led.On : Led.Idle, 
+        loading ? Led.Wait : Led.On
+    ];
+    
 
     dark.onChange = (e) => {
         console.log('Thems changed!!! ', e.target.checked);
@@ -22,9 +38,6 @@ export default function AppTopBar({ open, setOpen }: { open: boolean, setOpen: (
         setOpen(true);
     };
 
-    const handleDrawerClose = () => {
-        setOpen(false);
-    };
     return (
         <Toolbar>
             <IconButton
@@ -38,7 +51,7 @@ export default function AppTopBar({ open, setOpen }: { open: boolean, setOpen: (
             </IconButton>
             {/* Led panel */}
             <Typography sx={{ fontSize: 6, cursor: 'default' }} component="span">
-                {led1} {led2} {led3} {led4}
+                {leds.map((led, index) => (led ))}
             </Typography>
             <Box sx={{ flexGrow: 1 }} />
             {/* App Icon */}

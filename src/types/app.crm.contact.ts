@@ -1,4 +1,4 @@
-import { TodoItem } from "./app.crm.todo";
+import { TodoItem } from "./app.crm.tasks";
 
 export interface ContactItem {
     id: string;

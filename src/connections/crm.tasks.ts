@@ -1,34 +1,38 @@
 import { addDoc, collection, deleteDoc, doc, getDocs } from "firebase/firestore";
-import { ContactItem } from "../types/app.crm.contact";
+import { TodoItem } from "../types/app.crm.tasks";
 import { auth, db } from "../firebase-config";
 
-const CONTACTS_COLLECTION = 'contacts';
-export function listAllContact(uid: string): Promise<ContactItem[]> {
-    const itemCollectionContext = collection(db, `users`, uid, CONTACTS_COLLECTION);
+export function listAllTasks(uid: string): Promise<TodoItem[]> {
+    if (uid === '' || uid === null || uid === undefined) {
+        console.log('listAllTasks empty uid');
+        return Promise.resolve([]);
+    }
+    const itemCollectionContext = collection(db, `users`, uid, `todos`);
 
     return new Promise((resolve, reject) => {
         getDocs(itemCollectionContext)
             .then(response => {
-                console.log('listAllContact success');
+                console.log('listAllTasks success');
                 const items = response.docs.map((doc) => ({
                     ...doc.data(),
-                    id: doc.id
-                } as ContactItem));
+                    id: doc.id,
+                    dueDate: doc.data().dueDate ? doc.data().dueDate?.toDate() : null,
+                } as TodoItem));
                 resolve(items);
             })
             .catch(err => {
-                console.log('listAllContact error', err);
+                console.log('listAllTasks error', err);
                 reject(err);
             });
     });
 };
 
-export function createContact(item: ContactItem): Promise<ContactItem> {
-    const itemCollectionContext = collection(db, `users/${auth.currentUser?.uid}/${CONTACTS_COLLECTION}`);
+export function createTask(item: TodoItem): Promise<TodoItem> {
+    const itemCollectionContext = collection(db, `users/${auth.currentUser?.uid}/todos`);
     return new Promise((resolve, reject) => {
         addDoc(itemCollectionContext, item)
             .then(response => {
-                console.log('createItem response success');
+                console.log('createItem success');
                 resolve({ ...item, id: response.id });
             })
             .catch(err => {
@@ -38,9 +42,8 @@ export function createContact(item: ContactItem): Promise<ContactItem> {
     });
 };
 
-export function deleteContact(uid: string, id: string): Promise<boolean> {
-    const docRef = doc(db, `users/${uid}/${CONTACTS_COLLECTION}/${id}`);
-    console.log('deleteItem', { id });
+export function deleteTask(uid: string, id: string): Promise<boolean> {
+    const docRef = doc(db, `users/${uid}/todos/${id}`);
 
     return new Promise((resolve, reject) => {
         deleteDoc(docRef)

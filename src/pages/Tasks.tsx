@@ -1,7 +1,7 @@
 import React, { } from "react";
 import { Grid, Paper } from "@mui/material";
 import { styled } from '@mui/material/styles';
-import TodoGrid from "../components/todo/TodoGrid";
+import TaskGrid from "../components/tasks/TaskGrid";
 import { useAccessToken } from "../providers/AccessTokenProvider";
 import { PageProps } from "./page.props";
 
@@ -20,7 +20,7 @@ export default function Tasks({ loading, setLoading }: PageProps) {
             <Grid item xs={12} sm={12}>
                 <Item>
                     {currentUser?.id &&
-                        <TodoGrid 
+                        <TaskGrid 
                             loading={loading} 
                             setLoading={setLoading}
                         />

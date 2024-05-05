@@ -9,7 +9,6 @@ import useGoogleIdentityClientLibrary from '../hooks/useGoogleIdentityClientLibr
 import { fetchUserInfo } from '../connections/gapis';
 import { createUser, getUserByEmail } from '../connections/crm.user';
 import useGoogleImplicitLogin from '../hooks/useGoogleImplicitLogin';
-import { useNavigate } from 'react-router-dom';
 import { guidGenerator } from '../utils';
 
 export const BASIC_SCOPES = [
@@ -65,7 +64,6 @@ export default function AccessTokenProvider({
 }: AccessTokenProviderProp) {
     const { config } = useContext<Settings>(AppSettingContext);
     const scriptLoadedSuccessfully = useGoogleIdentityClientLibrary({ nonce: '1234567890' });
-    const navigate = useNavigate();
     const setLoadingRef = useRef(setLoading);
     setLoadingRef.current = setLoading;
     const loadingRef = useRef(loading);
@@ -73,7 +71,7 @@ export default function AccessTokenProvider({
 
     const [accessToken, setAccessToken] = useState<AccessToken | null>(null);
     const [currentUser, setCurrentUser] = useState<UserIdentity | null>(null);
-    const [currentState, setCurrentState] = useState<string>(guidGenerator());
+    const [currentState] = useState<string>(guidGenerator());
     const [scope, setScope] = useState<string | null>(null);
     const [resion, setResion] = useState<string | null>(null);
 
@@ -129,7 +127,7 @@ export default function AccessTokenProvider({
         clearStoredTokens();
         setAccessToken(null);
         setCurrentUser(null);
-        navigate('/login');
+        
     };
     const signOutRef = useRef(signOut);
     signOutRef.current = signOut;
@@ -196,7 +194,6 @@ export default function AccessTokenProvider({
         if (currentUser) {
             if (currentUser?.id) {
                 console.log('useEffect userIdentity exist 🙂');
-                navigate('/dashboard');
             }
             else {
                 console.log('useEffect userIdentity exist but id is null, try to signin to firestore 🚀');

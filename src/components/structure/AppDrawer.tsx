@@ -1,6 +1,6 @@
 import React from 'react'
 import { styled, useTheme } from '@mui/material/styles';
-import { Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemText, Typography } from '@mui/material';
+import { Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -164,16 +164,6 @@ export default function AppDrawer({ open, onClose }: AppDrawerProps) {
                             <SettingsIcon />
                         </ListItemIcon>
                         <ListItemText primary={"Settings"} />
-                    </ListItemButton>
-                </ListItem>
-                <ListItem key={"Login"}
-                    onClick={() => navigate('/login')}
-                    disablePadding>
-                    <ListItemButton>
-                        <ListItemIcon>
-                            <SettingsIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={"Login"} />
                     </ListItemButton>
                 </ListItem>
             </List>
