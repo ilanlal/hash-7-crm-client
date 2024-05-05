@@ -115,7 +115,7 @@ export default function TodoGrid({ loading, setLoading }: TodoGridProps) {
                     <GridActionsCellItem
                         icon={<EditIcon />}
                         label="Edit"
-                        
+
                         onClick={handleEditClick(id)}
                         color="inherit"
                     />,
@@ -174,10 +174,6 @@ export default function TodoGrid({ loading, setLoading }: TodoGridProps) {
     const [rows, setRows] = React.useState<TodoItem[]>([]);
     const setRowsRef = useRef(setRows);
     setRowsRef.current = setRows;
-
-    const handelClick = (item: TodoItem) => {
-        console.log('handelClick', item);
-    };
 
     const handleAddClick = () => {
         const id = guidGenerator();
@@ -317,7 +313,7 @@ export default function TodoGrid({ loading, setLoading }: TodoGridProps) {
                     <DataGrid
                         autoHeight
                         rows={rows}
-
+                        {...rows}
                         columns={columns}
                         editMode="row"
                         rowModesModel={rowModesModel}
@@ -337,14 +333,10 @@ export default function TodoGrid({ loading, setLoading }: TodoGridProps) {
                                 showQuickFilter: true
                             }
                         }}
+
                         initialState={{
-                            pagination: {
-                                paginationModel: {
-                                    pageSize: 5,
-                                },
-                            }
+                            pagination: { paginationModel: { pageSize: 5 } }
                         }}
-                        onRowClick={(params) => handelClick(params.row as TodoItem)}
                         pageSizeOptions={[5, 15, 25]}
                     />
                 </Box>

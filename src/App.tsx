@@ -73,9 +73,9 @@ export default function App() {
   return (
     <AppViewContext.Provider value={{
       loading, setLoading,
-      led1: (loading ? Led.Wait : Led.On),
-      led2: (accessToken ? Led.On : Led.Wait),
-      led3: (currentUser ? Led.On : Led.Wait),
+      led3: (loading ? Led.Wait : Led.On),
+      led1: (accessToken ? Led.On : Led.Wait),
+      led2: (currentUser ? Led.On : Led.Wait),
       //led4: (isOnlineRef.current ? Led.On : Led.Error),
     }}>
 

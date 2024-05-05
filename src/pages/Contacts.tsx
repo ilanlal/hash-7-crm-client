@@ -2,7 +2,6 @@ import React, { } from "react";
 import { Grid, Paper } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import ContactGrid from "../components/contacts/ContactGrid";
-import { ContactItem } from "../types/app.crm.contact";
 import { useAccessToken } from "../providers/AccessTokenProvider";
 import { PageProps } from "./page.props";
 
