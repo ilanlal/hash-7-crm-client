@@ -1,36 +1,36 @@
 import { addDoc, collection, deleteDoc, doc, getDocs } from "firebase/firestore";
 import { auth, db } from "../firebase-config";
-import { LeadItem } from "../types/app.crm.leads";
+import { CustomerItem } from "../types/app.crm.customers";
 
-const LEAD_COLLECTION = 'leads';
-export function listAllLeads(uid: string): Promise<LeadItem[]> {
+const CUSTOMERS_COLLECTION = 'customers';
+export function listAllCustomers(uid: string): Promise<CustomerItem[]> {
     if (uid === '' || uid === null || uid === undefined) {
-        console.log('listAllLeads empty uid');
+        console.log('listAllCustomers empty uid');
         return Promise.resolve([]);
     }
-    const itemCollectionContext = collection(db, `users`, uid, LEAD_COLLECTION);
+    const itemCollectionContext = collection(db, `users`, uid, CUSTOMERS_COLLECTION);
 
     return new Promise((resolve, reject) => {
         getDocs(itemCollectionContext)
             .then(response => {
-                console.log('listAllLeads success');
+                console.log('listAllCustomers success');
                 const items = response.docs.map((doc) => ({
                     ...doc.data(),
                     createdOn: doc.data().createdOn.toDate(),
                     modifiedOn: doc.data().modifiedOn.toDate(),
                     id: doc.id
-                } as LeadItem));
+                } as CustomerItem));
                 resolve(items);
             })
             .catch(err => {
-                console.log('listAllLeads error', err);
+                console.log('listAllCustomers error', err);
                 reject(err);
             });
     });
 };
 
-export function createLead(item: LeadItem): Promise<LeadItem> {
-    const itemCollectionContext = collection(db, `users/${auth.currentUser?.uid}/${LEAD_COLLECTION}`);
+export function createCustomer(item: CustomerItem): Promise<CustomerItem> {
+    const itemCollectionContext = collection(db, `users/${auth.currentUser?.uid}/${CUSTOMERS_COLLECTION}`);
     return new Promise((resolve, reject) => {
         addDoc(itemCollectionContext, item)
             .then(response => {
@@ -44,8 +44,8 @@ export function createLead(item: LeadItem): Promise<LeadItem> {
     });
 };
 
-export function deleteLead(uid: string, id: string): Promise<boolean> {
-    const docRef = doc(db, `users/${uid}/${LEAD_COLLECTION}/${id}`);
+export function deleteCustomer(uid: string, id: string): Promise<boolean> {
+    const docRef = doc(db, `users/${uid}/${CUSTOMERS_COLLECTION}/${id}`);
 
     return new Promise((resolve, reject) => {
         deleteDoc(docRef)

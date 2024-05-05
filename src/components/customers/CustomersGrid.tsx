@@ -1,21 +1,24 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Stack, Typography } from '@mui/material';
+import { AppBar, Box, Button, Dialog, DialogContent, IconButton, Stack, TextField, Toolbar, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
+import CloseIcon from '@mui/icons-material/Close';
 import { addDoc, collection, deleteDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase-config';
 import { DataGrid, GridActionsCellItem, GridColDef, GridEventListener, GridRowEditStopReasons, GridRowId, GridRowModes, GridRowModesModel, GridSlots, GridToolbar } from '@mui/x-data-grid';
 import { guidGenerator } from '../../utils';
 import RowActionsMenu from './RowActionsMenu';
-import { ContactItem } from '../../types/app.crm.contact';
-import { listAllContact } from '../../connections/crm.contacts';
 import { useAccessToken } from '../../providers/AccessTokenProvider';
 import { PageProps } from '../../pages/page.props';
+import { CustomerItem } from '../../types/app.crm.customers';
+import { listAllCustomers } from '../../connections/crm.customers';
 
-export default function ContactGrid({ loading, setLoading }: PageProps) {
-    const COLLECTION_NAME = 'contacts';
-    const columns: GridColDef<ContactItem>[] = [
+export default function CustomersGrid({ loading, setLoading }: PageProps) {
+    const COLLECTION_NAME = 'customers';
+    const columns: GridColDef<CustomerItem>[] = [
         {
             field: 'id',
             type: 'string',
@@ -28,34 +31,27 @@ export default function ContactGrid({ loading, setLoading }: PageProps) {
             groupable: false,
             filterable: false,
             disableColumnMenu: true,
-            valueFormatter: (params) => '🤴',
+            valueFormatter: (params) => '🌐',
         },
         {
-            field: 'displayName',
+            field: 'title',
             headerName: 'Name',
             width: 150,
             editable: true,
-            description: 'Name of the contact'
+            description: 'Name of the customer',
         },
         {
-            field: 'email',
-            headerName: 'Email',
-            description: 'Email address of the contact',
-            type: 'string',
-            width: 210,
-            editable: true
-        },
-        {
-            field: 'phone',
-            headerName: 'Phone',
+            field: 'description',
+            headerName: '📑 Details',
+            description: 'Details of the customer',
             width: 250,
-
-            editable: true
+            editable: true,
+            //flex: 1,
         },
         {
             field: 'createdOn',
             headerName: '🕒 Created On',
-            description: 'Date and time when the contact was created',
+            description: 'Date and time when the customer was created',
             type: 'dateTime',
             width: 210,
             editable: false,
@@ -94,8 +90,13 @@ export default function ContactGrid({ loading, setLoading }: PageProps) {
                     <GridActionsCellItem
                         icon={<EditIcon />}
                         label="Edit"
-
                         onClick={handleEditClick(id)}
+                        color="inherit"
+                    />,
+                    <GridActionsCellItem
+                        icon={<OpenInNewIcon />}
+                        label="Open to edit"
+                        onClick={() => setSelectedCustomer(rows.find((row) => row.id === id) || null)}
                         color="inherit"
                     />,
                     <RowActionsMenu id={id as string}
@@ -118,21 +119,20 @@ export default function ContactGrid({ loading, setLoading }: PageProps) {
                                 .then((response) => {
                                     const item = response.data();
                                     if (item) {
-                                        const _item = {
+                                        const todoItem = {
                                             id: '',
-                                            displayName: 'Copy of ' + item.displayName,
-                                            email: item.email || null,
-                                            phone: item.phone,
+                                            title: 'Copy of ' + item.title,
+                                            description: item.description || null,
                                             createdOn: new Date(),
                                             modifiedOn: new Date()
                                         };
                                         const itemCollectionContext = collection(db, `users`, currentUser?.id || '', COLLECTION_NAME);
 
-                                        addDoc(itemCollectionContext, _item)
+                                        addDoc(itemCollectionContext, todoItem)
                                             .then((response) => {
                                                 console.log('createItem success', response);
-                                                _item.id = response.id;
-                                                setRows([...rows, _item]);
+                                                todoItem.id = response.id;
+                                                setRows([...rows, todoItem]);
                                             });
                                     }
                                 });
@@ -144,22 +144,21 @@ export default function ContactGrid({ loading, setLoading }: PageProps) {
         }
     ];
 
-    const [openFormDialog, setOpenFormDialog] = React.useState(false);
-
     const setLodingRef = useRef(setLoading);
     setLodingRef.current = setLoading;
 
     const { currentUser } = useAccessToken();
+    const [selectedCustomer, setSelectedCustomer] = useState<CustomerItem | null>(null);
 
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
-    const [rows, setRows] = React.useState<ContactItem[]>([]);
+    const [rows, setRows] = useState<CustomerItem[]>([]);
     const setRowsRef = useRef(setRows);
     setRowsRef.current = setRows;
 
     const handleAddClick = () => {
         const id = guidGenerator();
         // Add a new row to the grid
-        setRows([...rows, { id, displayName: 'New Contact', isNew: true }]);
+        setRows([...rows, { id, title: 'New Customer', isNew: true }]);
         setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
 
     };
@@ -190,25 +189,24 @@ export default function ContactGrid({ loading, setLoading }: PageProps) {
         }
     };
 
-    const processRowUpdate = (newRow: ContactItem): Promise<ContactItem> => {
+    const processRowUpdate = (newRow: CustomerItem): Promise<CustomerItem> => {
         console.log('processRowUpdate', newRow);
         return new Promise((resolve, reject) => {
             if (newRow.isNew) {
                 console.log('createItem', newRow);
-                const _item = {
+                const todoItem = {
                     id: '',
-                    displayName: newRow.displayName,
-                    email: newRow.email || null,
-                    phone: newRow.phone || null,
+                    title: newRow.title,
+                    description: newRow.description || null,
                     createdOn: new Date(),
                     modifiedOn: new Date()
                 };
                 const itemCollectionContext = collection(db, `users`, currentUser?.id || '', COLLECTION_NAME);
 
-                addDoc(itemCollectionContext, _item)
+                addDoc(itemCollectionContext, todoItem)
                     .then((response) => {
                         console.log('createItem success', response);
-                        _item.id = response.id;
+                        todoItem.id = response.id;
                         //setRows([...rows, newRow]);
                         resolve(newRow);
                     });
@@ -234,10 +232,9 @@ export default function ContactGrid({ loading, setLoading }: PageProps) {
 
     const handleRefreshClick = () => {
         console.log('handleRefresh');
-        if (!currentUser?.id) return;
         setLoading(true);
         setRows([]);
-        listAllContact(currentUser?.id || '').then((items) => {
+        listAllCustomers(currentUser?.id || '').then((items) => {
             setRows(items);
         })
             .finally(() => {
@@ -246,9 +243,12 @@ export default function ContactGrid({ loading, setLoading }: PageProps) {
     };
 
     useEffect(() => {
-        if (!currentUser?.id) return;
+        if (!currentUser?.id) {
+            console.log('currentUser?.id is null');
+            return;
+        }
         setLodingRef.current(true);
-        listAllContact(currentUser?.id || '').then((items) => {
+        listAllCustomers(currentUser?.id || '').then((items) => {
             setRowsRef.current(items);
         })
             .finally(() => {
@@ -283,13 +283,14 @@ export default function ContactGrid({ loading, setLoading }: PageProps) {
                     </Button>
                     <Box sx={{ flexGrow: 1 }} />
                     <Typography alignContent={'center'} variant="caption" component="span">
-                        {COLLECTION_NAME}
+                        Customers
                     </Typography>
                 </Stack>
                 <Box sx={{ m: '1' }}>
                     <DataGrid
                         autoHeight
                         rows={rows}
+                        {...rows}
                         columns={columns}
                         editMode="row"
                         rowModesModel={rowModesModel}
@@ -309,43 +310,78 @@ export default function ContactGrid({ loading, setLoading }: PageProps) {
                                 showQuickFilter: true
                             }
                         }}
-                        initialState={{ pagination: { paginationModel: { pageSize: 5 } } }}
+
+                        initialState={{
+                            pagination: { paginationModel: { pageSize: 25 } }
+                        }}
                         pageSizeOptions={[5, 15, 25]}
                     />
                 </Box>
             </Box>
             <Dialog
-                open={openFormDialog}
+                fullScreen
+                open={selectedCustomer ? true : false}
                 onClose={() => {
-                    console.log('Close the dialog');
-                    setOpenFormDialog(false);
+                    //console.log('Close the dialog');
+                    //setOpenFormDialog(false);
                 }}
-                aria-labelledby="contact-dialog-title"
-                aria-describedby="contact-dialog-description"
+                aria-labelledby="customer-dialog-title"
+                aria-describedby="customer-dialog-description"
             >
-                <DialogTitle id="contact-dialog-title">Delete this item?</DialogTitle>
+
+                <AppBar sx={{ position: 'relative' }}>
+                    <Toolbar>
+                        <IconButton
+                            edge="start"
+                            color="inherit"
+                            onClick={() => {
+                                console.log('Close the dialog');
+                                selectedCustomer && setSelectedCustomer(null);
+                                //setOpenFormDialog(false);
+                            }}
+                            aria-label="close"
+                        >
+                            <CloseIcon />
+                        </IconButton>
+                        <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+                            Customer Details
+                        </Typography>
+                        <Button autoFocus color="inherit" onClick={() => {
+                            console.log('Save customer');
+                            selectedCustomer && setSelectedCustomer(null);
+                        }}>
+                            save
+                        </Button>
+                    </Toolbar>
+                </AppBar>
                 <DialogContent>
-                    <DialogContentText id="contact-dialog-description">
-                        This action cannot be undone.
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => {
-                        console.log('Cancel delete');
-                        setOpenFormDialog(false);
-                        //handleClose();
-                    }}>Cancel</Button>
-                    <Button
-                        onClick={() => {
-                            console.log('Save contact');
-                            setOpenFormDialog(false);
+                    <Box
+                        component="form"
+                        sx={{
+                            '& .MuiTextField-root': { m: 1, width: '25ch' },
                         }}
-                        color="warning"
-                        autoFocus
-                    >
-                        Save
-                    </Button>
-                </DialogActions>
+                        autoComplete="off">
+                        <TextField
+                            required
+                            id="title"
+                            label="Name"
+                            value={selectedCustomer?.title || ''}
+                            variant="standard"
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                selectedCustomer && setSelectedCustomer({ ...selectedCustomer, title: event.target.value });
+                            }}
+                        />
+                        <TextField
+                            id="description"
+                            label="Description"
+                            value={selectedCustomer?.description || ''}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                selectedCustomer && setSelectedCustomer({ ...selectedCustomer, description: event.target.value });
+                            }}
+                            variant="standard"
+                        />
+                    </Box>
+                </DialogContent>
             </Dialog>
         </>
     )

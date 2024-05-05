@@ -7,8 +7,6 @@ import ArchiveIcon from '@mui/icons-material/Archive';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import ContactIcon from '@mui/icons-material/PersonAdd';
-import AccountIcon from '@mui/icons-material/AddBox';
 
 interface RowActionsMenuProps {
     id: string;
@@ -58,26 +56,17 @@ export default function RowActionsMenu(props: RowActionsMenuProps) {
             open={openAnc}
             onClose={handleClose}
         >
-             <MenuItem onClick={() => handleDuplicateClick(id)} disableRipple divider>
-                <FileCopyIcon sx={{m:1}}/>
-                Duplicate
-            </MenuItem>
-            <MenuItem onClick={() => handleDuplicateClick(id)} disableRipple >
-                <AccountIcon sx={{m:1}}/>
-                Create Account
-            </MenuItem>
-            <MenuItem onClick={() => handleDuplicateClick(id)} disableRipple divider>
-                <ContactIcon sx={{m:1}}/>
-                Create Contact
-            </MenuItem>
-           
-            <MenuItem onClick={() => handleArchive && handleArchive(id)} disableRipple>
-                <ArchiveIcon sx={{m:1}}/>
-                Archive
-            </MenuItem>
             <MenuItem onClick={() => setOpenConfirmDeleteDialog(true)} disableRipple>
                 <DeleteIcon sx={{m:1}}/>
                 Delete
+            </MenuItem>
+            <MenuItem onClick={() => handleDuplicateClick(id)} disableRipple divider>
+                <FileCopyIcon sx={{m:1}}/>
+                Duplicate
+            </MenuItem>
+            <MenuItem onClick={() => handleArchive && handleArchive(id)} disableRipple>
+                <ArchiveIcon sx={{m:1}}/>
+                Archive
             </MenuItem>
         </Menu>
         <Dialog

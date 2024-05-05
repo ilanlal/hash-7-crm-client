@@ -15,6 +15,8 @@ export function listAllTasks(uid: string): Promise<TodoItem[]> {
                 console.log('listAllTasks success');
                 const items = response.docs.map((doc) => ({
                     ...doc.data(),
+                    createdOn: doc.data().createdOn?.toDate(),
+                    modifiedOn: doc.data().modifiedOn?.toDate(),
                     id: doc.id,
                     dueDate: doc.data().dueDate ? doc.data().dueDate?.toDate() : null,
                 } as TodoItem));

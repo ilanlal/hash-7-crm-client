@@ -12,6 +12,8 @@ export function listAllContact(uid: string): Promise<ContactItem[]> {
                 console.log('listAllContact success');
                 const items = response.docs.map((doc) => ({
                     ...doc.data(),
+                    createdOn: doc.data().createdOn.toDate(),
+                    modifiedOn: doc.data().modifiedOn.toDate(),
                     id: doc.id
                 } as ContactItem));
                 resolve(items);

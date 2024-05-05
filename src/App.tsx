@@ -15,6 +15,7 @@ import Dashboard from './pages/Dashboard';
 import NotFound from './pages/NotFound';
 import Leads from './pages/Leads';
 import Settings from './pages/Settings';
+import Customers from './pages/Customers';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -88,6 +89,7 @@ export default function App() {
               <Route path="/contacts" element={<Contacts loading={loading} setLoading={setLoading} />} />
               <Route path="/tasks" element={<Tasks loading={loading} setLoading={setLoading} />} />
               <Route path="/leads" element={<Leads loading={loading} setLoading={setLoading} />} />
+              <Route path="/customers" element={<Customers loading={loading} setLoading={setLoading} />} />
               <Route path="/settings" element={<Settings loading={loading} setLoading={setLoading} />} />
               <Route path="*" element={<NotFound />} />
             </React.Fragment>

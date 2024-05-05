@@ -6,10 +6,12 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import SettingsIcon from '@mui/icons-material/Settings';
 import TaskIcon from '@mui/icons-material/Task';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import LeadIcon from '@mui/icons-material/AccountBox';
-import ReportProblemIcon from '@mui/icons-material/ReportProblem';
-import ContactIcon from '@mui/icons-material/ContactPhone';
+import LeadIcon from '@mui/icons-material/Interests';
+import ContactIcon from '@mui/icons-material/Contacts';
+import AccountIcon from '@mui/icons-material/CardMembership';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
+import OrdersIcon from '@mui/icons-material/ShoppingCart';
+import ProductIcon from '@mui/icons-material/CollectionsBookmark';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import { useNavigate } from 'react-router-dom';
 
@@ -87,6 +89,50 @@ export default function AppDrawer({ open, onClose }: AppDrawerProps) {
                         <ListItemText primary={"Leads"} />
                     </ListItemButton>
                 </ListItem>
+
+                <ListItem key={"Customers"}
+                    onClick={() => navigate('/customers')}
+                    disablePadding>
+                    <ListItemButton>
+                        <ListItemIcon>
+                            <AccountIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={"Customers"} />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem key={"Orders"}
+                    onClick={() => navigate('/orders')}
+                    disablePadding>
+                    <ListItemButton>
+                        <ListItemIcon>
+                            <OrdersIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={"Orders"} />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem key={"Services"}
+                    onClick={() => navigate('/incidents')}
+                    disablePadding>
+                    <ListItemButton>
+                        <ListItemIcon>
+                            <SupportAgentIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={"Services"} />
+                    </ListItemButton>
+                </ListItem>
+
+                <Divider />
+
+                <ListItem key={"Products"}
+                    onClick={() => navigate('/products')}
+                    disablePadding>
+                    <ListItemButton>
+                        <ListItemIcon>
+                            <ProductIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={"Products"} />
+                    </ListItemButton>
+                </ListItem>
                 <ListItem key={"Contact"}
                     onClick={() => navigate('/contacts')}
                     disablePadding>
@@ -97,65 +143,8 @@ export default function AppDrawer({ open, onClose }: AppDrawerProps) {
                         <ListItemText primary={"Contacts"} />
                     </ListItemButton>
                 </ListItem>
-                <ListItem key={"Accounts"}
-                    onClick={() => navigate('/accounts')}
-                    disablePadding>
-                    <ListItemButton>
-                        <ListItemIcon>
-                            <ContactIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={"Accounts"} />
-                    </ListItemButton>
-                </ListItem>
-            </List>
-            <Divider />
-            <List>
-                <ListItem key={"Products"}
-                    onClick={() => navigate('/products')}
-                    disablePadding>
-                    <ListItemButton>
-                        <ListItemIcon>
-                            <SupportAgentIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={"Products"} />
-                    </ListItemButton>
-                </ListItem>
-                <ListItem key={"Orders"}
-                    onClick={() => navigate('/orders')}
-                    disablePadding>
-                    <ListItemButton>
-                        <ListItemIcon>
-                            <ReportProblemIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={"Orders"} />
-                    </ListItemButton>
-                </ListItem>
-            </List>
-            <Divider />
-            <List>
-                <ListItem key={"Incident"}
-                    onClick={() => navigate('/incidents')}
-                    disablePadding>
-                    <ListItemButton>
-                        <ListItemIcon>
-                            <SupportAgentIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={"Incidents"} />
-                    </ListItemButton>
-                </ListItem>
-                <ListItem key={"Problems"}
-                    onClick={() => navigate('/problems')}
-                    disablePadding>
-                    <ListItemButton>
-                        <ListItemIcon>
-                            <ReportProblemIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={"Problems"} />
-                    </ListItemButton>
-                </ListItem>
-            </List>
-            <Divider />
-            <List>
+
+                <Divider />
                 <ListItem key={"Settings"}
                     onClick={() => navigate('/settings')}
                     disablePadding>

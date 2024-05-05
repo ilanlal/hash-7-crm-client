@@ -32,18 +32,27 @@ export default function LeadsGrid({ loading, setLoading }: PageProps) {
         },
         {
             field: 'title',
-            headerName: '💭 Tasks',
+            headerName: '📝 Title',
             width: 150,
             editable: true,
-            description: 'Title of the task'
+            description: 'Title of the lead',
         },
         {
             field: 'description',
             headerName: '📑 Details',
-            description: 'Details of the task',
+            description: 'Details of the lead',
             width: 250,
             editable: true,
-            flex: 1,
+            
+        },
+        {
+            field: 'createdOn',
+            headerName: '🕒 Created On',
+            description: 'Date and time the lead was created',
+            type: 'dateTime',
+            width: 210,
+            editable: false,
+            flex: 1
         },
         {
             field: 'actions',
@@ -264,7 +273,7 @@ export default function LeadsGrid({ loading, setLoading }: PageProps) {
                     </Button>
                     <Box sx={{ flexGrow: 1 }} />
                     <Typography alignContent={'center'} variant="caption" component="span">
-                        Tasks
+                        Leads
                     </Typography>
                 </Stack>
                 <Box sx={{ m: '1' }}>

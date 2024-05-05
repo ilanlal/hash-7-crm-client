@@ -79,7 +79,15 @@ export default function TaskGrid({ loading, setLoading }: TaskGridProps) {
             description: 'Details of the task',
             width: 250,
             editable: true,
-            flex: 1,
+        },
+        {
+            field: 'createdOn',
+            headerName: '🕒 Created On',
+            description: 'Date and time when the task was created',
+            type: 'dateTime',
+            width: 210,
+            editable: false,
+            flex: 1
         },
         {
             field: 'actions',
