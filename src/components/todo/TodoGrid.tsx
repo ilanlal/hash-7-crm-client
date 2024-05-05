@@ -12,10 +12,14 @@ import { guidGenerator, parseToTimePeriod } from '../../utils';
 import { listAll } from '../../connections/crm.todo';
 import RowActionsMenu from './RowActionsMenu';
 import dayjs from 'dayjs';
-import { useUserIdentity } from '../../providers/UserIdentityProvider';
+import { useAccessToken } from '../../providers/AccessTokenProvider';
 
+export interface TodoGridProps {
+    loading: boolean;
+    setLoading: (loading: boolean) => void;
+}
 
-export default function TodoGrid({ title, onItemClick }: { title?: string, onItemClick: (item: TodoItem) => void }) {
+export default function TodoGrid({ loading, setLoading }: TodoGridProps) {
     const columns: GridColDef<TodoItem>[] = [
         {
             field: 'id',
@@ -118,7 +122,7 @@ export default function TodoGrid({ title, onItemClick }: { title?: string, onIte
                     <RowActionsMenu id={id as string}
                         handleDelete={(id) => {
                             console.log('handleDelete', id);
-                            const docRef = doc(db, `users/${userIdentity?.id}/todos/${id}`);
+                            const docRef = doc(db, `users/${currentUser?.id}/todos/${id}`);
                             deleteDoc(docRef)
                                 .then(() => {
                                     setRows(rows.filter((row) => row.id !== id));
@@ -129,7 +133,7 @@ export default function TodoGrid({ title, onItemClick }: { title?: string, onIte
                         }}
                         handleDuplicate={(id) => {
                             console.log('handleDuplicate', id);
-                            const docRef = doc(db, `users/${userIdentity?.id}/todos/${id}`);
+                            const docRef = doc(db, `users/${currentUser?.id}/todos/${id}`);
                             // todo: duplicate the item
                             getDoc(docRef)
                                 .then((response) => {
@@ -144,7 +148,7 @@ export default function TodoGrid({ title, onItemClick }: { title?: string, onIte
                                             createdOn: new Date(),
                                             modifiedOn: new Date()
                                         };
-                                        const itemCollectionContext = collection(db, `users`, userIdentity?.id || '', `todos`);
+                                        const itemCollectionContext = collection(db, `users`, currentUser?.id || '', `todos`);
 
                                         addDoc(itemCollectionContext, todoItem)
                                             .then((response) => {
@@ -161,12 +165,10 @@ export default function TodoGrid({ title, onItemClick }: { title?: string, onIte
             },
         }
     ];
-
-    const { setLoading } = useContext<AppViewModel>(AppViewContext);
     const setLodingRef = useRef(setLoading);
     setLodingRef.current = setLoading;
 
-    const { userIdentity } = useUserIdentity();
+    const { currentUser } = useAccessToken();
 
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
     const [rows, setRows] = React.useState<TodoItem[]>([]);
@@ -226,7 +228,7 @@ export default function TodoGrid({ title, onItemClick }: { title?: string, onIte
                     createdOn: new Date(),
                     modifiedOn: new Date()
                 };
-                const itemCollectionContext = collection(db, `users`, userIdentity?.id || '', `todos`);
+                const itemCollectionContext = collection(db, `users`, currentUser?.id || '', `todos`);
 
                 addDoc(itemCollectionContext, todoItem)
                     .then((response) => {
@@ -238,7 +240,7 @@ export default function TodoGrid({ title, onItemClick }: { title?: string, onIte
             }
             else if (newRow.id) {
                 console.log('updateItem', newRow);
-                const docRef = doc(db, `users/${userIdentity?.id}/todos/${newRow.id}`);
+                const docRef = doc(db, `users/${currentUser?.id}/todos/${newRow.id}`);
                 updateDoc(docRef, { ...newRow as any, modifiedOn: new Date() })
                     .then(() => {
                         setRows(rows.map((row) => (row.id === newRow.id ? newRow : row)));
@@ -259,7 +261,7 @@ export default function TodoGrid({ title, onItemClick }: { title?: string, onIte
         console.log('handleRefresh');
         setLoading(true);
         setRows([]);
-        listAll(userIdentity?.id || '').then((items) => {
+        listAll(currentUser?.id || '').then((items) => {
             setRows(items);
         })
             .finally(() => {
@@ -268,14 +270,18 @@ export default function TodoGrid({ title, onItemClick }: { title?: string, onIte
     };
 
     useEffect(() => {
+        if (!currentUser?.id) {
+            console.log('currentUser?.id is null');
+            return;
+        }
         setLodingRef.current(true);
-        listAll(userIdentity?.id || '').then((items) => {
+        listAll(currentUser?.id || '').then((items) => {
             setRowsRef.current(items);
         })
             .finally(() => {
                 setLodingRef.current(false);
             });
-    }, [userIdentity?.id]);
+    }, [currentUser?.id]);
 
     return (
         <>

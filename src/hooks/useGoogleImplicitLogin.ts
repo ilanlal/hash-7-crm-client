@@ -7,11 +7,13 @@ interface GoogleImplicitLoginProp
     extends Omit<IdConfiguration, 'client_id' | 'scope' | 'callback'> {
     onSuccess: (accessToken: AccessToken) => void;
     onError?: (error: any) => void;
+    state?: string;
 }
 
 export default function useGoogleImplicitLogin({
     onSuccess,
-    onError
+    onError,
+    state: currentState
 }: GoogleImplicitLoginProp): () => void {
     const scriptLoadedSuccessfully = useGoogleIdentityClientLibrary({
         nonce: 'one-tap-login'
@@ -23,34 +25,32 @@ export default function useGoogleImplicitLogin({
     const onErrorRef = useRef(onError);
     onErrorRef.current = onError;
 
-    const clientRef = useRef<any>();
-    const clientIdRef = useRef(process.env.REACT_APP_GOOGLE_CLIENT_ID);
-    clientIdRef.current = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+    const clientRef = useRef<any>(null);
+
     useEffect(() => {
         if (!scriptLoadedSuccessfully) return;
         const clientMethod = 'initTokenClient';
 
         const client = window?.google?.accounts?.oauth2[clientMethod]({
-            client_id: clientIdRef.current,
+            client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+            state: currentState,
             scope: BASIC_SCOPES.join(' '),
             callback: (accessToken: AccessToken) => {
                 if (!accessToken?.access_token) {
                     console.error('No AccessToken found in response.', accessToken);
                     return onErrorRef.current?.('No AccessToken found in response.');
                 }
-                
+
                 onSuccessRef.current(accessToken);
             }
         });
 
         clientRef.current = client;
-
+        
         return () => {
-            console.log('useGoogleImplicitLogin cleanup');
-            //clientRef.current = null;
-            //window?.google?.accounts?.oauth2?.disconnect();
+            clientRef.current = null;
         };
-    }, [scriptLoadedSuccessfully]);
+    }, [currentState, scriptLoadedSuccessfully]);
 
     return useCallback(() => clientRef.current?.requestAccessToken(), []);
 };

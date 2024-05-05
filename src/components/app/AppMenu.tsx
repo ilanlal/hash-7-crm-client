@@ -7,7 +7,7 @@ import SingOutIcon from '@mui/icons-material/Logout';
 import { useAccessToken } from '../../providers/AccessTokenProvider';
 
 export default function AppMenu() {
-    const { handleSignOut, handleRevokeAccess, handleRefreshAccessToken } = useAccessToken();
+    const { signOut, revokeAccess, refreshAccessToken } = useAccessToken();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -36,15 +36,25 @@ export default function AppMenu() {
                 open={open}
                 onClose={handleClose}>
 
-                <MenuItem key='singout-from-profile' onClick={handleSignOut} divider>
+                <MenuItem key='singout-from-profile' onClick={()=>{
+                    handleClose();
+                    signOut?.();
+                }} divider>
                     <SingOutIcon sx={{ m: 1 }} />
                     Sing-out
                 </MenuItem>
-                <MenuItem key='revoke-granted-access' onClick={handleRevokeAccess}>
+                <MenuItem key='revoke-granted-access' onClick={()=>{
+                    handleClose();
+                    revokeAccess?.();
+                }}>
                     <SwitchAccountIcon sx={{ m: 1 }} />
                     Revoke Access
                 </MenuItem>
-                <MenuItem key='refresh-token' onClick={handleRefreshAccessToken}>
+                <MenuItem key='refresh-token' onClick={()=> {
+                    handleClose();
+                    refreshAccessToken?.();
+                
+                }}>
                     <RefreshIcon sx={{ m: 1 }} />
                     Refresh
                 </MenuItem>

@@ -5,7 +5,7 @@ import Timer from '../authentication/Timer';
 import { useAccessToken } from '../../providers/AccessTokenProvider';
 
 export default function AppFooter() {
-  const { accessToken, handleRefreshAccessToken } = useAccessToken();
+  const { accessToken, refreshAccessToken } = useAccessToken();
   const Copyright = () => (
     <Typography variant="body2" align="center">
       {'Built with '}
@@ -26,9 +26,9 @@ export default function AppFooter() {
       <Stack direction="row" spacing={2}>
         <Timer
           expiredAt={accessToken?.expired_timestamp || 0}
-          onExpired={()=>{
+          onExpired={() => {
             console.log('Token expired!!!');
-            handleRefreshAccessToken?.();
+            refreshAccessToken?.();
           }}
           expiredOffsetMinutes={5}
         />

@@ -1,20 +1,19 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, {  useEffect, useRef, useState } from 'react';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { AppViewContext, AppViewModel } from '../../context';
 import { addDoc, collection, deleteDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase-config';
 import { DataGrid, GridActionsCellItem, GridColDef, GridEventListener, GridRowEditStopReasons, GridRowId, GridRowModes, GridRowModesModel, GridSlots, GridToolbar } from '@mui/x-data-grid';
 import { guidGenerator } from '../../utils';
 import RowActionsMenu from './RowActionsMenu';
-import { useUserIdentity } from '../../providers/UserIdentityProvider';
 import { ContactItem } from '../../types/app.crm.contact';
 import { listAllContact } from '../../connections/crm.contacts';
+import { useAccessToken } from '../../providers/AccessTokenProvider';
+import { PageProps } from '../../pages/page.props';
 
-
-export default function ContactGrid({ title, onItemClick }: { title?: string, onItemClick: (item: ContactItem) => void }) {
+export default function ContactGrid({loading,setLoading}:PageProps) {
     const COLLECTION_NAME = 'contacts';
     const columns: GridColDef<ContactItem>[] = [
         {
@@ -93,7 +92,7 @@ export default function ContactGrid({ title, onItemClick }: { title?: string, on
                     <RowActionsMenu id={id as string}
                         handleDelete={(id) => {
                             console.log('handleDelete', id);
-                            const docRef = doc(db, `users/${userIdentity?.id}/${COLLECTION_NAME}/${id}`);
+                            const docRef = doc(db, `users/${currentUser?.id}/${COLLECTION_NAME}/${id}`);
                             deleteDoc(docRef)
                                 .then(() => {
                                     setRows(rows.filter((row) => row.id !== id));
@@ -104,7 +103,7 @@ export default function ContactGrid({ title, onItemClick }: { title?: string, on
                         }}
                         handleDuplicate={(id) => {
                             console.log('handleDuplicate', id);
-                            const docRef = doc(db, `users/${userIdentity?.id}/${COLLECTION_NAME}/${id}`);
+                            const docRef = doc(db, `users/${currentUser?.id}/${COLLECTION_NAME}/${id}`);
                             // todo: duplicate the item
                             getDoc(docRef)
                                 .then((response) => {
@@ -118,7 +117,7 @@ export default function ContactGrid({ title, onItemClick }: { title?: string, on
                                             createdOn: new Date(),
                                             modifiedOn: new Date()
                                         };
-                                        const itemCollectionContext = collection(db, `users`, userIdentity?.id || '', COLLECTION_NAME);
+                                        const itemCollectionContext = collection(db, `users`, currentUser?.id || '', COLLECTION_NAME);
 
                                         addDoc(itemCollectionContext, _item)
                                             .then((response) => {
@@ -136,11 +135,10 @@ export default function ContactGrid({ title, onItemClick }: { title?: string, on
         }
     ];
 
-    const { setLoading } = useContext<AppViewModel>(AppViewContext);
     const setLodingRef = useRef(setLoading);
     setLodingRef.current = setLoading;
 
-    const { userIdentity } = useUserIdentity();
+    const { currentUser } = useAccessToken();
 
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
     const [rows, setRows] = React.useState<ContactItem[]>([]);
@@ -198,7 +196,7 @@ export default function ContactGrid({ title, onItemClick }: { title?: string, on
                     createdOn: new Date(),
                     modifiedOn: new Date()
                 };
-                const itemCollectionContext = collection(db, `users`, userIdentity?.id || '', COLLECTION_NAME);
+                const itemCollectionContext = collection(db, `users`, currentUser?.id || '', COLLECTION_NAME);
 
                 addDoc(itemCollectionContext, _item)
                     .then((response) => {
@@ -210,7 +208,7 @@ export default function ContactGrid({ title, onItemClick }: { title?: string, on
             }
             else if (newRow.id) {
                 console.log('updateItem', newRow);
-                const docRef = doc(db, `users/${userIdentity?.id}/${COLLECTION_NAME}/${newRow.id}`);
+                const docRef = doc(db, `users/${currentUser?.id}/${COLLECTION_NAME}/${newRow.id}`);
                 updateDoc(docRef, { ...newRow as any, modifiedOn: new Date() })
                     .then(() => {
                         setRows(rows.map((row) => (row.id === newRow.id ? newRow : row)));
@@ -229,9 +227,10 @@ export default function ContactGrid({ title, onItemClick }: { title?: string, on
 
     const handleRefreshClick = () => {
         console.log('handleRefresh');
+        if(!currentUser?.id) return;
         setLoading(true);
         setRows([]);
-        listAllContact(userIdentity?.id || '').then((items) => {
+        listAllContact(currentUser?.id || '').then((items) => {
             setRows(items);
         })
             .finally(() => {
@@ -240,14 +239,15 @@ export default function ContactGrid({ title, onItemClick }: { title?: string, on
     };
 
     useEffect(() => {
+        if(!currentUser?.id) return;
         setLodingRef.current(true);
-        listAllContact(userIdentity?.id || '').then((items) => {
+        listAllContact(currentUser?.id || '').then((items) => {
             setRowsRef.current(items);
         })
             .finally(() => {
                 setLodingRef.current(false);
             });
-    }, [userIdentity?.id]);
+    }, [currentUser?.id]);
 
     return (
         <>

@@ -68,7 +68,7 @@ export interface AppDataModel {
     accessToken?: AccessToken | null;
     //setAccessToken: (accessToken: AccessToken | null) => void;
     userIdentity?: UserIdentity | null;
-    setUserIdentity: (userIdentity: UserIdentity | null) => void;
+    setUserIdentity?: (userIdentity: UserIdentity | null) => void;
 }
 
 export interface Settings {

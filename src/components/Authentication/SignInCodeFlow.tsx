@@ -9,7 +9,7 @@ import { AppSettingContext } from '../../context';
 
 export default function SignInCodeFlow() {
   const { config } = useContext<Settings>(AppSettingContext);
-  const { handleSignInSuccess } = useAccessToken();
+  const { signIn } = useAccessToken();
   const [error, setError] = useState<string | null>(null);
   // Handle new tokens from Google OAuth
   const verifyTokenByCode = (codeResponse: CodeResponse) => {
@@ -29,8 +29,7 @@ export default function SignInCodeFlow() {
           return Promise.resolve(tokensResponse);
         }
 
-        handleSignInSuccess?.(tokensResponse);
-        return Promise.resolve(tokensResponse);
+        return signIn;
       })
       .catch((error) => {
         console.error('fetchTokensByAuthCode error', error);

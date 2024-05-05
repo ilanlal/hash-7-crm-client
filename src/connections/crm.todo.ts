@@ -3,6 +3,11 @@ import { TimePeriod, TodoItem } from "../types/app.crm.todo";
 import { auth, db } from "../firebase-config";
 
 export function listAll(uid: string): Promise<TodoItem[]> {
+    console.log('listTodoItems', { uid });
+    if (uid === '' || uid === null || uid === undefined) {
+        console.log('listTodoItems empty uid');
+        return Promise.resolve([]);
+    }
     const itemCollectionContext = collection(db, `users`, uid, `todos`);
 
     return new Promise((resolve, reject) => {
